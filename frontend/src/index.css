@@ -1,0 +1,45 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background-color: #F8F9FC;
+    color: #111827;
+    -webkit-font-smoothing: antialiased;
+    scroll-behavior: smooth;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track { background: #f1f1f1; }
+  ::-webkit-scrollbar-thumb { background: #c4c4c4; border-radius: 99px; }
+  ::-webkit-scrollbar-thumb:hover { background: #6C63FF; }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary text-white px-5 py-2.5 rounded-full font-semibold text-sm hover:bg-primary-dark transition-all duration-200 disabled:opacity-50;
+  }
+  .btn-outline {
+    @apply border border-primary text-primary px-5 py-2.5 rounded-full font-semibold text-sm hover:bg-accent transition-all duration-200;
+  }
+  .card {
+    @apply bg-white rounded-2xl shadow-card;
+  }
+  .input {
+    @apply w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition;
+  }
+  .badge {
+    @apply text-xs px-2.5 py-1 rounded-full font-medium;
+  }
+}

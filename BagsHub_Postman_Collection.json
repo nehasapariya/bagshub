@@ -1,0 +1,319 @@
+{
+  "info": {
+    "name": "BagsHub API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base", "value": "http://localhost:5000/api" },
+    { "key": "userToken", "value": "" },
+    { "key": "vendorToken", "value": "" },
+    { "key": "adminToken", "value": "" },
+    { "key": "productId", "value": "" },
+    { "key": "categoryId", "value": "" },
+    { "key": "orderId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "🔐 Auth",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST", "url": "{{base}}/auth/register",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"test@example.com\",\n  \"password\": \"test1234\",\n  \"role\": \"user\"\n}" }
+          }
+        },
+        {
+          "name": "Login — Customer",
+          "event": [{ "listen": "test", "script": { "exec": ["pm.collectionVariables.set('userToken', pm.response.json().accessToken);"] } }],
+          "request": {
+            "method": "POST", "url": "{{base}}/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"neha@example.com\",\n  \"password\": \"neha1234\"\n}" }
+          }
+        },
+        {
+          "name": "Login — Vendor",
+          "event": [{ "listen": "test", "script": { "exec": ["pm.collectionVariables.set('vendorToken', pm.response.json().accessToken);"] } }],
+          "request": {
+            "method": "POST", "url": "{{base}}/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"riya@bagshub.com\",\n  \"password\": \"riya1234\"\n}" }
+          }
+        },
+        {
+          "name": "Login — Admin",
+          "event": [{ "listen": "test", "script": { "exec": ["pm.collectionVariables.set('adminToken', pm.response.json().accessToken);"] } }],
+          "request": {
+            "method": "POST", "url": "{{base}}/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"admin@bagshub.com\",\n  \"password\": \"admin123\"\n}" }
+          }
+        },
+        {
+          "name": "Get Me",
+          "request": {
+            "method": "GET", "url": "{{base}}/auth/me",
+            "header": [{ "key": "Authorization", "value": "Bearer {{userToken}}" }]
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "request": { "method": "POST", "url": "{{base}}/auth/refresh-token" }
+        },
+        {
+          "name": "Forgot Password",
+          "request": {
+            "method": "POST", "url": "{{base}}/auth/forgot-password",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"email\": \"neha@example.com\" }" }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST", "url": "{{base}}/auth/logout",
+            "header": [{ "key": "Authorization", "value": "Bearer {{userToken}}" }]
+          }
+        }
+      ]
+    },
+    {
+      "name": "🗂️ Categories",
+      "item": [
+        {
+          "name": "Get All Categories",
+          "request": { "method": "GET", "url": "{{base}}/categories" }
+        },
+        {
+          "name": "Create Category (Admin)",
+          "request": {
+            "method": "POST", "url": "{{base}}/categories",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "body": { "mode": "raw", "raw": "{ \"name\": \"Clutches\", \"icon\": \"👝\" }" }
+          }
+        },
+        {
+          "name": "Update Category (Admin)",
+          "request": {
+            "method": "PUT", "url": "{{base}}/categories/{{categoryId}}",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "body": { "mode": "raw", "raw": "{ \"status\": \"inactive\" }" }
+          }
+        },
+        {
+          "name": "Delete Category (Admin)",
+          "request": {
+            "method": "DELETE", "url": "{{base}}/categories/{{categoryId}}",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }]
+          }
+        }
+      ]
+    },
+    {
+      "name": "👜 Products",
+      "item": [
+        { "name": "Get All Products", "request": { "method": "GET", "url": "{{base}}/products?page=1&limit=10" } },
+        { "name": "Search Products", "request": { "method": "GET", "url": "{{base}}/products/search?q=leather" } },
+        { "name": "Filter Products", "request": { "method": "GET", "url": "{{base}}/products/filter?minPrice=500&maxPrice=3000&rating=4" } },
+        { "name": "Get Product by ID", "request": { "method": "GET", "url": "{{base}}/products/{{productId}}" } }
+      ]
+    },
+    {
+      "name": "❤️ Wishlist",
+      "item": [
+        {
+          "name": "Get Wishlist",
+          "request": { "method": "GET", "url": "{{base}}/wishlist", "header": [{ "key": "Authorization", "value": "Bearer {{userToken}}" }] }
+        },
+        {
+          "name": "Toggle Wishlist",
+          "request": {
+            "method": "POST", "url": "{{base}}/wishlist",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{userToken}}" }],
+            "body": { "mode": "raw", "raw": "{ \"productId\": \"{{productId}}\" }" }
+          }
+        },
+        {
+          "name": "Remove from Wishlist",
+          "request": { "method": "DELETE", "url": "{{base}}/wishlist/{{productId}}", "header": [{ "key": "Authorization", "value": "Bearer {{userToken}}" }] }
+        }
+      ]
+    },
+    {
+      "name": "🛒 Cart",
+      "item": [
+        {
+          "name": "Get Cart",
+          "request": { "method": "GET", "url": "{{base}}/cart", "header": [{ "key": "Authorization", "value": "Bearer {{userToken}}" }] }
+        },
+        {
+          "name": "Add to Cart",
+          "request": {
+            "method": "POST", "url": "{{base}}/cart",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{userToken}}" }],
+            "body": { "mode": "raw", "raw": "{\n  \"productId\": \"{{productId}}\",\n  \"color\": \"Black\",\n  \"qty\": 1\n}" }
+          }
+        },
+        {
+          "name": "Update Cart Item",
+          "request": {
+            "method": "PATCH", "url": "{{base}}/cart/{{productId}}",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{userToken}}" }],
+            "body": { "mode": "raw", "raw": "{ \"qty\": 3 }" }
+          }
+        },
+        {
+          "name": "Remove from Cart",
+          "request": { "method": "DELETE", "url": "{{base}}/cart/{{productId}}", "header": [{ "key": "Authorization", "value": "Bearer {{userToken}}" }] }
+        }
+      ]
+    },
+    {
+      "name": "📦 Orders",
+      "item": [
+        {
+          "name": "Place Order",
+          "event": [{ "listen": "test", "script": { "exec": ["pm.collectionVariables.set('orderId', pm.response.json().data?._id);"] } }],
+          "request": {
+            "method": "POST", "url": "{{base}}/orders",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{userToken}}" }],
+            "body": { "mode": "raw", "raw": "{\n  \"shippingAddress\": {\n    \"name\": \"Neha Sapariya\",\n    \"phone\": \"+91 98765 43210\",\n    \"address\": \"12, MG Road\",\n    \"city\": \"Ahmedabad\",\n    \"state\": \"Gujarat\",\n    \"pincode\": \"380001\"\n  }\n}" }
+          }
+        },
+        {
+          "name": "My Orders",
+          "request": { "method": "GET", "url": "{{base}}/orders/my", "header": [{ "key": "Authorization", "value": "Bearer {{userToken}}" }] }
+        },
+        {
+          "name": "Order by ID",
+          "request": { "method": "GET", "url": "{{base}}/orders/{{orderId}}", "header": [{ "key": "Authorization", "value": "Bearer {{userToken}}" }] }
+        },
+        {
+          "name": "Cancel Order",
+          "request": { "method": "PATCH", "url": "{{base}}/orders/{{orderId}}/cancel", "header": [{ "key": "Authorization", "value": "Bearer {{userToken}}" }] }
+        }
+      ]
+    },
+    {
+      "name": "⭐ Reviews",
+      "item": [
+        {
+          "name": "Get Product Reviews",
+          "request": { "method": "GET", "url": "{{base}}/reviews/{{productId}}" }
+        },
+        {
+          "name": "Add Review",
+          "request": {
+            "method": "POST", "url": "{{base}}/reviews",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{userToken}}" }],
+            "body": { "mode": "raw", "raw": "{\n  \"productId\": \"{{productId}}\",\n  \"rating\": 5,\n  \"comment\": \"Excellent quality!\"\n}" }
+          }
+        },
+        {
+          "name": "Delete Review",
+          "request": { "method": "DELETE", "url": "{{base}}/reviews/{{orderId}}", "header": [{ "key": "Authorization", "value": "Bearer {{userToken}}" }] }
+        }
+      ]
+    },
+    {
+      "name": "🏪 Vendor",
+      "item": [
+        { "name": "Dashboard", "request": { "method": "GET", "url": "{{base}}/vendor/dashboard", "header": [{ "key": "Authorization", "value": "Bearer {{vendorToken}}" }] } },
+        {
+          "name": "Add Product",
+          "request": {
+            "method": "POST", "url": "{{base}}/vendor/products",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{vendorToken}}" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Canvas Tote\",\n  \"description\": \"Eco-friendly tote\",\n  \"price\": 1299,\n  \"originalPrice\": 1799,\n  \"category\": \"{{categoryId}}\",\n  \"stock\": 50,\n  \"colors\": [\"Beige\", \"Black\"],\n  \"tags\": [\"canvas\", \"eco\"],\n  \"images\": [\"https://images.unsplash.com/photo-1591561954557-26941169b49e?w=400\"]\n}" }
+          }
+        },
+        { "name": "My Products", "request": { "method": "GET", "url": "{{base}}/vendor/products", "header": [{ "key": "Authorization", "value": "Bearer {{vendorToken}}" }] } },
+        { "name": "Inventory", "request": { "method": "GET", "url": "{{base}}/vendor/inventory", "header": [{ "key": "Authorization", "value": "Bearer {{vendorToken}}" }] } },
+        {
+          "name": "Update Stock",
+          "request": {
+            "method": "PATCH", "url": "{{base}}/vendor/inventory/{{productId}}",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{vendorToken}}" }],
+            "body": { "mode": "raw", "raw": "{ \"stock\": 100 }" }
+          }
+        },
+        { "name": "Vendor Orders", "request": { "method": "GET", "url": "{{base}}/vendor/orders", "header": [{ "key": "Authorization", "value": "Bearer {{vendorToken}}" }] } },
+        {
+          "name": "Confirm Order",
+          "request": {
+            "method": "PATCH", "url": "{{base}}/vendor/orders/{{orderId}}/status",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{vendorToken}}" }],
+            "body": { "mode": "raw", "raw": "{ \"status\": \"Confirmed\" }" }
+          }
+        },
+        {
+          "name": "Ship Order",
+          "request": {
+            "method": "PATCH", "url": "{{base}}/vendor/orders/{{orderId}}/status",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{vendorToken}}" }],
+            "body": { "mode": "raw", "raw": "{ \"status\": \"Shipped\" }" }
+          }
+        },
+        {
+          "name": "Deliver Order",
+          "request": {
+            "method": "PATCH", "url": "{{base}}/vendor/orders/{{orderId}}/status",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{vendorToken}}" }],
+            "body": { "mode": "raw", "raw": "{ \"status\": \"Delivered\" }" }
+          }
+        },
+        { "name": "Earnings", "request": { "method": "GET", "url": "{{base}}/vendor/earnings", "header": [{ "key": "Authorization", "value": "Bearer {{vendorToken}}" }] } },
+        { "name": "Payouts", "request": { "method": "GET", "url": "{{base}}/vendor/payouts", "header": [{ "key": "Authorization", "value": "Bearer {{vendorToken}}" }] } }
+      ]
+    },
+    {
+      "name": "🛡️ Admin",
+      "item": [
+        { "name": "Dashboard", "request": { "method": "GET", "url": "{{base}}/admin/dashboard", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }] } },
+        { "name": "All Users", "request": { "method": "GET", "url": "{{base}}/admin/users?role=user", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }] } },
+        { "name": "Block User", "request": { "method": "PATCH", "url": "{{base}}/admin/users/{{productId}}/block", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }] } },
+        {
+          "name": "Change User Role",
+          "request": {
+            "method": "PATCH", "url": "{{base}}/admin/users/{{productId}}/role",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "body": { "mode": "raw", "raw": "{ \"role\": \"vendor\" }" }
+          }
+        },
+        { "name": "All Products", "request": { "method": "GET", "url": "{{base}}/admin/products?status=pending", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }] } },
+        { "name": "Approve Product", "request": { "method": "PATCH", "url": "{{base}}/admin/products/{{productId}}/approve", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }] } },
+        { "name": "Reject Product", "request": { "method": "PATCH", "url": "{{base}}/admin/products/{{productId}}/reject", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }] } },
+        { "name": "All Orders", "request": { "method": "GET", "url": "{{base}}/admin/orders", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }] } },
+        {
+          "name": "Override Order Status",
+          "request": {
+            "method": "PATCH", "url": "{{base}}/admin/orders/{{orderId}}/status",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "body": { "mode": "raw", "raw": "{ \"status\": \"Cancelled\" }" }
+          }
+        },
+        { "name": "Revenue", "request": { "method": "GET", "url": "{{base}}/admin/revenue", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }] } },
+        { "name": "Commissions", "request": { "method": "GET", "url": "{{base}}/admin/commissions", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }] } },
+        {
+          "name": "Update Commission",
+          "request": {
+            "method": "PATCH", "url": "{{base}}/admin/commissions",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "body": { "mode": "raw", "raw": "{ \"rate\": 10 }" }
+          }
+        },
+        { "name": "All Reviews", "request": { "method": "GET", "url": "{{base}}/admin/reviews?reported=true", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }] } },
+        {
+          "name": "Moderate Review",
+          "request": {
+            "method": "PATCH", "url": "{{base}}/admin/reviews/{{orderId}}",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "body": { "mode": "raw", "raw": "{ \"status\": \"approved\" }" }
+          }
+        }
+      ]
+    }
+  ]
+}
